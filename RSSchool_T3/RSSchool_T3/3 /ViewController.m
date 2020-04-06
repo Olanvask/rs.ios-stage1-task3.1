@@ -1,9 +1,11 @@
 #import "ViewController.h"
 
-int const DEFAULT_WIDTH = 80;
+int const DEFAULT_WIDTH = 150;
 int const DEFAULT_HEIGHT = 30;
 int const SPACING = 10;
+int const V_SPACING = 5;
 NSMutableArray *arrayOfViews;
+int posYForButton;
 
 @interface ViewController() <UITextFieldDelegate>
 @property (nonatomic, strong) UILabel *labelResultColor;
@@ -34,6 +36,7 @@ NSMutableArray *arrayOfViews;
 }
 
 -(void)createSubViews{
+
     self.view.accessibilityIdentifier = @"mainView";
     arrayOfViews = [NSMutableArray new];
     self.buttonProcess = [[UIButton alloc] init];
@@ -64,19 +67,19 @@ NSMutableArray *arrayOfViews;
     self.textFieldBlue.accessibilityIdentifier = @"textFieldBlue";
     [arrayOfViews addObject:self.textFieldBlue];
     CGFloat screenWidth = UIScreen.mainScreen.bounds.size.width;
-    CGPoint origin = CGPointMake(50, 50);
-    int offsetForFirst = 50;
+    CGPoint origin = CGPointMake(50, 30);
+    int offsetForFirst = 30;
     int i = 1;
     while (i < [arrayOfViews count]){
         if ((i%2) != 0) {
             NSString *colorName = [[arrayOfViews[i] accessibilityIdentifier] substringWithRange:
                                    NSMakeRange(5, [[arrayOfViews[i] accessibilityIdentifier] length]-5)];
-            [arrayOfViews[i] setFrame:CGRectMake(origin.x, origin.y + DEFAULT_HEIGHT*i + SPACING*i, DEFAULT_WIDTH + offsetForFirst, DEFAULT_HEIGHT)];
+            [arrayOfViews[i] setFrame:CGRectMake(origin.x, origin.y + DEFAULT_HEIGHT*i + V_SPACING, DEFAULT_WIDTH + offsetForFirst, DEFAULT_HEIGHT)];
             
             [arrayOfViews[i] setText: [colorName uppercaseString]];
             
         }else{
-            [arrayOfViews[i] setFrame:CGRectMake(origin.x + SPACING + DEFAULT_WIDTH + offsetForFirst, origin.y + DEFAULT_HEIGHT*(i-1)+ SPACING*(i-1), screenWidth - DEFAULT_WIDTH - 100 - offsetForFirst - SPACING*2, DEFAULT_HEIGHT)];
+            [arrayOfViews[i] setFrame:CGRectMake(origin.x + SPACING + DEFAULT_WIDTH + offsetForFirst, origin.y + DEFAULT_HEIGHT*(i-1)+ V_SPACING, DEFAULT_WIDTH - offsetForFirst, DEFAULT_HEIGHT)];
             if ([arrayOfViews[i] isKindOfClass:[UITextField class]]){
                 [arrayOfViews[i] setPlaceholder:@"0..255"];
                 [arrayOfViews[i] setDelegate: self];
@@ -96,12 +99,14 @@ NSMutableArray *arrayOfViews;
          
         i++;
     }
-    [self.buttonProcess setFrame:CGRectMake(self.view.bounds.size.width/2 - DEFAULT_WIDTH/2 , origin.y + i*SPACING + i*DEFAULT_HEIGHT, DEFAULT_WIDTH, DEFAULT_HEIGHT)];
+    posYForButton = origin.y + i*V_SPACING + i*DEFAULT_HEIGHT;
+    [self.buttonProcess setFrame:CGRectMake(self.view.bounds.size.width/2 - DEFAULT_WIDTH/2 , origin.y + i*V_SPACING + i*DEFAULT_HEIGHT, DEFAULT_WIDTH, DEFAULT_HEIGHT)];
     [self.buttonProcess setTitle:@"Process" forState:UIControlStateNormal];
     [self.buttonProcess setTitleColor:UIColor.blueColor forState:UIControlStateNormal];
     [self.buttonProcess setTitleColor:UIColor.grayColor forState:UIControlStateHighlighted];
     [self.view addSubview:self.buttonProcess];
     [self.buttonProcess addTarget:self action:@selector(processButtonDidTaped) forControlEvents:UIControlEventTouchUpInside];
+    
     self.labelResultColor.text = @"Color";
     
 }
@@ -161,5 +166,8 @@ NSMutableArray *arrayOfViews;
         self.labelResultColor.text = @"Color";
  //   }
     return YES;
+}
+-(void)viewWillLayoutSubviews{
+    [self.buttonProcess setFrame:CGRectMake(self.view.bounds.size.width/2 - DEFAULT_WIDTH/2 , posYForButton, DEFAULT_WIDTH, DEFAULT_HEIGHT)];
 }
 @end
